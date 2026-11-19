@@ -71,11 +71,11 @@ One binary crate, no library target.
 - Images under `docs/design/runtime/` are generated with the `--capture-*`
   flags described in the README.
 - Commit subjects are short imperative sentences without a prefix.
+- Peer session tests must drive both sides until `Disconnected` and call
+  `listener.close().await` before the listener task returns. A session is a lazy
+  stream: an unpolled side cannot answer CLOSE, and a dropped listener can cut
+  QUIC teardown short; either way the other side waits out `CLOSE_TIMEOUT` (8 s).
 
 ## Known gaps
 
 - There is no LICENSE file yet; the team has to choose one.
-- Two tests in `src/peer.rs` (`direct_sessions_exchange_and_ack_persistable_mls_proposals`
-  and `pinned_sessions_exchange_acknowledged_call_signaling`) take 8 s each
-  because the receiver waits out `CLOSE_TIMEOUT` for a CloseAck the idle
-  sender never sends.
